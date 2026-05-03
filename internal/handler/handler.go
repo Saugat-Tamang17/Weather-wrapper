@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
-"encoding/json"
-"strconv"
+	"strconv"
+
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/weather"
 )
 
@@ -20,18 +21,32 @@ func (h *WeatherHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	longstr := r.URL.Query().Get("lng")
 
 	if latsstr == "" || longstr == "" {
-		http.Error(w, "Latitude and Longitude are nboth required",http.StatusBadRequest)
+		http.Error(w, "Latitude and Longitude are nboth required", http.StatusBadRequest)
 		return
 	}
 
-	long,err:=strconv.ParseFloat(longstr,64)
-	if err !=nil{
-		http.Error(w,"Invalid Longitude value :",http.StatusBadRequest)
+	long, err := strconv.ParseFloat(longstr, 64)
+	if err != nil {
+		http.Error(w, "Invalid Longitude value :", http.StatusBadRequest)
 		return
 	}
 
-	lat, err :=strconv.ParseFloat(latsstr,64)
-	if err !=nil{
-		http.Error(w,"Invalid Latitude value:",http.StatusBadRequest)
+	lat, err := strconv.ParseFloat(latsstr, 64)
+	if err != nil {
+		http.Error(w, "Invalid Latitude value:", http.StatusBadRequest)
 	}
-	
+
+	coords := weather.Coordinates{
+		Latitude:  lat,
+		Longitude: long,
+	}
+
+	result, err := h.client.GetWeather(coords)
+	if err != nil {
+		http.Error(w, "failed to fetch the weather", http.StatusBadGateway)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+}
