@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"sync"
 	"time"
+
+	"github.com/Saugat-Tamang17/weather-wrapper/internal/config"
 )
 
 type cacheEntry struct {
@@ -21,12 +23,12 @@ type Client struct {
 	mu         sync.RWMutex
 }
 
-func NewClient(baseURL string) *Client {
+func NewClient(cfg *config.Config) *Client {
 	return &Client{
-		baseURL: baseURL,
-		httpClient: &http.Client{
-			Timeout: 10 * time.Second,
-		},
+		baseURL:    cfg.OpenMeteoURL,
+		httpClient: &http.Client{Timeout: 10 * time.Second},
+		cacheTTL:   time.Duration(cfg.CacheTTLSeconds) * time.Second,
+		cache:      make(map[string]cacheEntry),
 	}
 }
 
