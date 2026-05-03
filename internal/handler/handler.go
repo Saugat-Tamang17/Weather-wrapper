@@ -2,7 +2,8 @@ package handler
 
 import (
 	"net/http"
-
+"encoding/json"
+"strconv"
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/weather"
 )
 
@@ -19,6 +20,18 @@ func (h *WeatherHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	longstr := r.URL.Query().Get("lng")
 
 	if latsstr == "" || longstr == "" {
-		http.Error(w, "Latitude and Longitude  ")
+		http.Error(w, "Latitude and Longitude are nboth required",http.StatusBadRequest)
+		return
 	}
-}
+
+	long,err:=strconv.ParseFloat(longstr,64)
+	if err !=nil{
+		http.Error(w,"Invalid Longitude value :",http.StatusBadRequest)
+		return
+	}
+
+	lat, err :=strconv.ParseFloat(latsstr,64)
+	if err !=nil{
+		http.Error(w,"Invalid Latitude value:",http.StatusBadRequest)
+	}
+	
