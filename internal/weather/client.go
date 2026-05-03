@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+type cacheEntry struct {
+	response  *WeatherResponse
+	fetchedAt time.Time
+}
 type Client struct {
 	baseURL    string
 	httpClient *http.Client
