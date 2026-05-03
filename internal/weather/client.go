@@ -5,12 +5,16 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 )
 
 type Client struct {
 	baseURL    string
 	httpClient *http.Client
+	cacheTTL   time.Duration
+	cache      map[string]cacheEntry
+	mu         sync.RWMutex
 }
 
 func NewClient(baseURL string) *Client {
