@@ -26,7 +26,7 @@ func (c *Client) GetWeather(coords Coordinates) (*WeatherResponse, error) {
 	params := url.Values{}
 	params.Set("latitude", fmt.Sprintf("%f", coords.Latitude))
 	params.Set("longitude", fmt.Sprintf("%f", coords.Longitude))
-	params.Set("current_weather", "true")
+	params.Set("current", "temperature_2m,windspeed_10m,weathercode,is_day,relative_humidity_2m")
 
 	fullURL := fmt.Sprintf("%s?%s", c.baseURL, params.Encode())
 
