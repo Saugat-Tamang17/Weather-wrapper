@@ -7,7 +7,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -0 weather-wrapper ./main.go
+RUN go build -o weather-wrapper ./main.go
 
 FROM alpine:latest
 
