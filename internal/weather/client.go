@@ -7,14 +7,13 @@ import (
 	"net/url"
 	"sync"
 	"time"
-
-	"github.com/Saugat-Tamang17/weather-wrapper/internal/config"
 )
 
 type cacheEntry struct {
 	response  *WeatherResponse
 	fetchedAt time.Time
 }
+
 type Client struct {
 	baseURL    string
 	httpClient *http.Client
@@ -23,16 +22,27 @@ type Client struct {
 	mu         sync.RWMutex
 }
 
-func NewClient(cfg *config.Config) *Client {
+func NewClient(baseURL string, cacheTTLSeconds int) *Client {
 	return &Client{
-		baseURL:    cfg.OpenMeteoURL,
+		baseURL:    baseURL,
 		httpClient: &http.Client{Timeout: 10 * time.Second},
-		cacheTTL:   time.Duration(cfg.CacheTTLSeconds) * time.Second,
+		cacheTTL:   time.Duration(cacheTTLSeconds) * time.Second,
 		cache:      make(map[string]cacheEntry),
 	}
 }
 
 func (c *Client) GetWeather(coords Coordinates) (*WeatherResponse, error) {
+	key := fmt.Sprintf("%f,%f", coords.Latitude, coords.Longitude)
+
+	c.mu.RLock()
+	if entry, ok := c.cache[key]; ok {
+		if time.Since(entry.fetchedAt) < c.cacheTTL {
+			c.mu.RUnlock()
+			return entry.response, nil
+		}
+	}
+	c.mu.RUnlock()
+
 	params := url.Values{}
 	params.Set("latitude", fmt.Sprintf("%f", coords.Latitude))
 	params.Set("longitude", fmt.Sprintf("%f", coords.Longitude))
@@ -54,6 +64,13 @@ func (c *Client) GetWeather(coords Coordinates) (*WeatherResponse, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("decode failed: %w", err)
 	}
+
+	c.mu.Lock()
+	c.cache[key] = cacheEntry{
+		response:  &result,
+		fetchedAt: time.Now(),
+	}
+	c.mu.Unlock()
 
 	return &result, nil
 }
