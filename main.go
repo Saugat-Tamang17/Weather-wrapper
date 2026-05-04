@@ -15,7 +15,7 @@ func main() {
 	cfg := config.Load()
 
 	// 2. Create weather client (talks to external API)
-	weatherClient := weather.NewClient(cfg.APIURL)
+	weatherClient := weather.NewClient(cfg.APIURL, cfg.CacheTime)
 
 	// 3. Create HTTP handler (depends on client)
 	weatherHandler := handler.New(weatherClient)
