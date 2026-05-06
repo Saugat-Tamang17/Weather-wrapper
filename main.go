@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/config"
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/handler"
@@ -50,11 +52,13 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	// 6. Start server
-	log.Printf("Server starting on port :%s", cfg.Port)
+	log.Println("Shutdown Signal has been Received (CTRL+C or docker stop), Draining the inflight Request ...")
 
-	err := http.ListenAndServe(":"+cfg.Port, mux)
-	if err != nil {
-		log.Fatalf("server failed: %v", err)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Forced Shutdown :%v", err)
 	}
+	log.Println("Server Exited Properly or Cleanly I suppose ")
 }
