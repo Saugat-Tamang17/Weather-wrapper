@@ -14,7 +14,7 @@ func main() {
 	// 1. Load configuration (port, API keys, etc.)
 	cfg := config.Load()
 
-	// 2. Create weather client (talks to external API)
+	// 2. Create weather client (talks to external API) //
 	weatherClient := weather.NewClient(cfg.APIURL, cfg.CacheTime)
 
 	// 3. Create HTTP handler (depends on client)
@@ -30,6 +30,18 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "seems okay")
 	})
+
+	server := &http.Server{
+		Addr:    ":" + cfg.Port,
+		Handler: mux,
+	}
+
+	go func() {
+		log.Printf("Server starting on port :%s", cfg.Port)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server failed:%v", err)
+		}
+	}()
 
 	// 6. Start server
 	log.Printf("Server starting on port :%s", cfg.Port)
