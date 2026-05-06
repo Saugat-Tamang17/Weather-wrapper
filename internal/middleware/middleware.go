@@ -3,8 +3,10 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
+	"time"
 )
 
 type contextKey string
@@ -27,4 +29,16 @@ type responseWriter struct {
 func (rw *responseWriter) WriteHeader(code int) {
 	rw.status = code
 	rw.ResponseWriter.WriteHeader(code)
+}
+
+func Logger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.now()
+		rw := &responseWriter{ResponseWriter: w, status: http.StatusOK}
+
+		next.ServeHTTP(rw, r)
+
+		id, _ := r.Context().Value(RequestIDKey).(string)
+		log.Printf("[%s] %s %s %d %v", id, r.Method, r.URL.Path, rw.status, time.Since(start))
+	})
 }
