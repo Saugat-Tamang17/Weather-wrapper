@@ -4,10 +4,9 @@ WORKDIR /app
 
 COPY go.mod go.sum ./
 RUN go mod download
-
 COPY . .
 
-RUN go build -o weather-wrapper ./main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o weather-wrapper ./main.go
 
 FROM alpine:latest
 
