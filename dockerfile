@@ -8,7 +8,11 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o weather-wrapper ./main.go
 
+
+
 FROM alpine:latest
+
+RUN apk add --no-cache ca-certificates
 
 WORKDIR /app
 
