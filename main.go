@@ -12,6 +12,7 @@ import (
 
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/config"
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/handler"
+	"github.com/Saugat-Tamang17/weather-wrapper/internal/middleware"
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/weather"
 )
 
@@ -38,7 +39,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
-		Handler: mux,
+		Handler: middleware.Logger(middleware.RequestID(mux)),
 	}
 
 	go func() {
