@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/config"
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/handler"
@@ -42,6 +45,10 @@ func main() {
 			log.Fatalf("Server failed:%v", err)
 		}
 	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 
 	// 6. Start server
 	log.Printf("Server starting on port :%s", cfg.Port)
