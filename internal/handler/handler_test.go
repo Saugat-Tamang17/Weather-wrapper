@@ -39,4 +39,10 @@ func TestWeatherHandler(t *testing) {
 		url : "/weather/?lat=57&long=abc",
 		wantStatus:400,
 	}
+	{
+		//case 4 ,for the latitude value being too low //
+		name:"lat value too low",
+		url :"/weather/?lat=-999&long=10"
+		wantStatus:400,
+	}
 }
