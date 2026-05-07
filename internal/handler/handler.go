@@ -34,6 +34,7 @@ func (h *WeatherHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	lat, err := strconv.ParseFloat(latsstr, 64)
 	if err != nil {
 		http.Error(w, "Invalid Latitude value:", http.StatusBadRequest)
+		return
 	}
 
 	if lat < -90 || lat > 90 {
@@ -41,7 +42,7 @@ func (h *WeatherHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if long < -180 || lat > 180 {
+	if long < -180 || long > 180 {
 		http.Error(w, "Longtitude value must be between -180 and 180", http.StatusBadRequest)
 		return
 	}
