@@ -65,6 +65,13 @@ func TestWeatherHandler(t *testing) {
 	}
 
 	{
+		//case 8, for the service failure//
+		name:"service Failure"
+		url :"/weather/?lat=10&long=10",
+		fakeErr:errors.New("api down")
+		wantStatus: 502,
+	}
+	{
 		
 	}
 }
