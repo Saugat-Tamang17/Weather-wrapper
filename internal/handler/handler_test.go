@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/weather"
@@ -75,9 +76,31 @@ func TestWeatherHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
-			// test implementation pending
-			_ = tt
+
+			// 1. create fake client
+			fake := &fakeClient{
+				response: tt.fakeResp,
+				err:      tt.fakeErr,
+			}
+
+			// 2. create handler
+			h := New(fake)
+
+			// 3. create request
+			req := httptest.NewRequest("GET", tt.url, nil)
+
+			// 4. create recorder
+			rec := httptest.NewRecorder()
+
+			// 5. call handler
+			h.ServeHTTP(rec, req)
+
+			// 6. assert status
+			if rec.Code != tt.wantStatus {
+				t.Errorf("got status %d, want %d", rec.Code, tt.wantStatus)
+			}
 		})
 	}
 }
