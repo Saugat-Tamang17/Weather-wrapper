@@ -34,6 +34,9 @@ func TestWeatherHandler(t *testing) {
 		wantStatus: 400,
 	}
 	{
-		
+		//case 3 , for the invalid longitude value //
+		name: "Invalid Long",
+		url : "/weather/?lat=57&long=abc",
+		wantStatus:400,
 	}
 }
