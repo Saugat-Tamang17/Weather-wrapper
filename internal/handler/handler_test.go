@@ -72,6 +72,10 @@ func TestWeatherHandler(t *testing) {
 		wantStatus: 502,
 	}
 	{
-		
+		//case 9, for the happy path //
+		name:       "happy path",
+		url:        "/weather?lat=10&lng=20",
+		fakeResp:   weather.Response{},
+		wantStatus: 200,
 	}
 }
