@@ -21,12 +21,18 @@ func TestWeatherHandler(t *testing) {
 		fakeErr    error
 		wantStatus int
 	}{
-		//case 1 //
+		//case 1 , for the missing parameters  //
 		name: "missing params",
 		url: "/weather",
 		wantStatus: 400,
 
 	},
+	{
+		//case 2 , for the invalid latitude value //
+		name : "Invalid Lat"
+		url: "/weather/?lat=abc&long=10",
+		wantStatus: 400,
+	}
 	{
 		
 	}
