@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -21,7 +22,7 @@ func (h *WeatherHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	longstr := r.URL.Query().Get("lng")
 
 	if latsstr == "" || longstr == "" {
-		http.Error(w, "Latitude and Longitude are nboth required", http.StatusBadRequest)
+		http.Error(w, "Latitude and Longitude are both required", http.StatusBadRequest)
 		return
 	}
 
@@ -58,5 +59,8 @@ func (h *WeatherHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		log.Printf("failed to encode response: %v", err)
+	}
+
 }
