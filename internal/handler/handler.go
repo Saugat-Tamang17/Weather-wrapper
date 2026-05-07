@@ -9,11 +9,15 @@ import (
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/weather"
 )
 
-type WeatherHandler struct {
-	client *weather.Client
+type WeatherService interface {
+	GetWeather(coords weather.Coordinates) (*weather.WeatherResponse, error)
 }
 
-func New(client *weather.Client) *WeatherHandler {
+type WeatherHandler struct {
+	client WeatherService
+}
+
+func New(client WeatherService) *WeatherHandler {
 	return &WeatherHandler{client: client}
 }
 
