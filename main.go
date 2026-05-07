@@ -39,7 +39,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
-		Handler: middleware.Logger(middleware.RequestID(mux)),
+		Handler: middleware.Recovery(middleware.Logger(middleware.RequestID(mux))),
 	}
 
 	go func() {
