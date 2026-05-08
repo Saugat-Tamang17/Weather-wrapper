@@ -64,6 +64,29 @@ func TestClient_GetWeather_Upstream503(t *testing.T) {
 	}
 }
 
+func TestClient_GetWeather_MalformedJSON(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("this is not valid json"))
+	}))
+	defer server.Close()
+
+	client := NewClient(server.URL, 60)
+
+	resp, err := client.GetWeather(Coordinates{
+		Latitude:  27.7,
+		Longitude: 85.3,
+	})
+
+	if err == nil {
+		t.Fatalf("expected error due to malformed JSON, got nil")
+	}
+
+	if resp != nil {
+		t.Fatalf("expected nil response, got %+v", resp)
+	}
+}
+
 func TestClient_GetWeather_CacheHit(t *testing.T) {
 	var callCount atomic.Int32
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
