@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
 )
 
@@ -40,7 +41,7 @@ func TestClient_GetWeather_HappyPath(t *testing.T) {
 }
 func TestClient_GetWeather_Upstream503(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
+		w.WriteHeader(http.StatusServiceUnavailable)
 	}))
 	defer server.Close()
 
@@ -64,9 +65,9 @@ func TestClient_GetWeather_Upstream503(t *testing.T) {
 }
 
 func TestClient_GetWeather_CacheHit(t *testing.T) {
-	var callCount int
+	var callCount atomic.Int32
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		callCount++
+		callCount.Add(1)
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{
@@ -96,8 +97,8 @@ func TestClient_GetWeather_CacheHit(t *testing.T) {
 		t.Fatalf("second call failed: %v", err)
 	}
 
-	if callCount != 1 {
-		t.Fatalf("expected 1 upstream call, got %d", callCount)
+	if callCount.Load() != 1 {
+		t.Fatalf("expected 1 upstream call, got %d", callCount.Load())
 	}
 
 }
