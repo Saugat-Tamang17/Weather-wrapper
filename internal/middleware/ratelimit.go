@@ -20,3 +20,15 @@ func NewRateLimiter(r rate.Limit, burst int) *RateLimiter {
 		burst:    burst,
 	}
 }
+
+func (rl *RateLimiter) getLimiter(ip string) *rate.Limiter {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+
+	if limiter, ok := rl.limiters[ip]; ok {
+		return limiter
+	}
+	limiter := rate.NewLimiter(rl.rate, rl.burst)
+	rl.limiters[ip] = limiter
+	return limiter
+}
