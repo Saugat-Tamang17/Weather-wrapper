@@ -3,6 +3,7 @@ package middleware
 import (
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 
 	"golang.org/x/time/rate"
@@ -38,7 +39,8 @@ func (rl *RateLimiter) getLimiter(ip string) *rate.Limiter {
 func getIP(r *http.Request) string {
 	ip := r.Header.Get("X-Forwarded-For")
 	if ip != "" {
-		return ip
+		parts := strings.Split(ip, ",")
+		return strings.TrimSpace(parts[0])
 	}
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
