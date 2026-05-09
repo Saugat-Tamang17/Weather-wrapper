@@ -12,3 +12,11 @@ type RateLimiter struct {
 	rate     rate.Limit
 	burst    int
 }
+
+func NewRateLimiter(r rate.Limit, burst int) *RateLimiter {
+	return &RateLimiter{
+		limiters: make(map[string]*rate.Limiter),
+		rate:     r,
+		burst:    burst,
+	}
+}
