@@ -37,9 +37,10 @@ func main() {
 		fmt.Fprintln(w, "seems okay")
 	})
 
+	limiter := middleware.NewRateLimiter(5, 10)
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
-		Handler: middleware.Recovery(middleware.Logger(middleware.RequestID(mux))),
+		Handler: middleware.Recovery(middleware.Logger(limiter.Middleware(mux))),
 	}
 
 	go func() {
