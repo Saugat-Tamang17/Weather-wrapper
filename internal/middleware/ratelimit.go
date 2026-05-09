@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net"
 	"net/http"
 	"sync"
 
@@ -36,7 +37,10 @@ func (rl *RateLimiter) getLimiter(ip string) *rate.Limiter {
 
 func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip := r.RemoteAddr
+		ip, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			ip = r.RemoteAddr
+		}
 		if !rl.getLimiter(ip).Allow() {
 			http.Error(w, "rate limit exceeded", http.StatusTooManyRequests)
 			return
