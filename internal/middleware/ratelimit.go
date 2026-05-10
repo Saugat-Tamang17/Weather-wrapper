@@ -25,6 +25,8 @@ func NewRateLimiter(r rate.Limit, burst int) *RateLimiter {
 		rate:     r,
 		burst:    burst,
 	}
+	go rl.cleanupLoop()
+	return rl
 }
 
 func (rl *RateLimiter) getLimiter(ip string) *rate.Limiter {
