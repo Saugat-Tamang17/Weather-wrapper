@@ -51,10 +51,17 @@ func getIP(r *http.Request) string {
 func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := getIP(r)
-		if !rl.getLimiter(ip).Allow() {
+		limiter := rl.getLimiter(ip)
+		reservation := limiter.Reserve()
+		if !reservation.OK() || reservation.Delay > 0 {
+			if reservation.OK() {
+				reservation.Cancel()
+			}
+
+			w.Header().Set("Retry-After", "1")
 			http.Error(w, "rate limit exceeded", http.StatusTooManyRequests)
-			return
 		}
+
 		next.ServeHTTP(w, r)
 	})
 }
