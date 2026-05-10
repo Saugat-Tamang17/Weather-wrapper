@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"golang.org/x/time/rate"
+
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/config"
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/handler"
 	"github.com/Saugat-Tamang17/weather-wrapper/internal/middleware"
@@ -37,7 +39,7 @@ func main() {
 		fmt.Fprintln(w, "seems okay")
 	})
 
-	limiter := middleware.NewRateLimiter(5, 10)
+	limiter := middleware.NewRateLimiter(rate.Limit(cfg.RateLimitRate), cfg.RateLimitBurst)
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
 		Handler: middleware.Recovery(middleware.Logger(limiter.Middleware(mux))),
