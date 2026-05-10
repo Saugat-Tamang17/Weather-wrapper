@@ -7,9 +7,12 @@ import (
 )
 
 type config struct {
-	Port      string
-	APIURL    string
-	CacheTime int
+	Port           string
+	APIURL         string
+	WeatherFields  string
+	CacheTime      int
+	RateLimitRate  float64
+	RateLimitBurst int
 }
 
 func Load() *config {
@@ -29,8 +32,9 @@ func Load() *config {
 	}
 
 	return &config{
-		Port:      port,
-		APIURL:    "https://api.open-meteo.com/v1/forecast",
-		CacheTime: ttl,
+		Port:          port,
+		APIURL:        "https://api.open-meteo.com/v1/forecast",
+		WeatherFields: "temperature_2m,windspeed_10m,relative_humidity_2m,weathercode,is_day",
+		CacheTime:     ttl,
 	}
 }
