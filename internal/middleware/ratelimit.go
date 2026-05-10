@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"golang.org/x/time/rate"
 )
@@ -12,6 +13,7 @@ import (
 type RateLimiter struct {
 	mu       sync.Mutex
 	limiters map[string]*rate.Limiter
+	lastSeen map[string]time.Time
 	rate     rate.Limit
 	burst    int
 }
