@@ -37,6 +37,13 @@ func Load() *config {
 			}
 		}
 
+		rlBurst := 10
+		if v := os.Getenv("RATE_LIMIT_BURST"); v != "" {
+			if parsed, err := strconv.Atoi(v); err == nil {
+				rlBurst = parsed
+			}
+		}
+
 	}
 
 	return &config{
