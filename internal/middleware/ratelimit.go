@@ -54,7 +54,9 @@ func (rl *RateLimiter) getLimiter(ip string) *rate.Limiter {
 	}
 	limiter := rate.NewLimiter(rl.rate, rl.burst)
 	rl.limiters[ip] = limiter
+	rl.lastSeen[ip] = time.Now()
 	return limiter
+
 }
 
 func getIP(r *http.Request) string {
