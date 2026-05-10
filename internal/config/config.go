@@ -29,6 +29,14 @@ func Load() *config {
 		} else {
 			ttl = parsed
 		}
+
+		rlRate := 5.0
+		if v := os.Getenv("RATE_LIMIT_RATE"); v != "" {
+			if parsed, err := strconv.ParseFloat(v, 64); err == nil {
+				rlRate = parsed
+			}
+		}
+
 	}
 
 	return &config{
