@@ -29,27 +29,28 @@ func Load() *config {
 		} else {
 			ttl = parsed
 		}
+	}
 
-		rlRate := 5.0
-		if v := os.Getenv("RATE_LIMIT_RATE"); v != "" {
-			if parsed, err := strconv.ParseFloat(v, 64); err == nil {
-				rlRate = parsed
-			}
+	rlRate := 5.0
+	if v := os.Getenv("RATE_LIMIT_RATE"); v != "" {
+		if parsed, err := strconv.ParseFloat(v, 64); err == nil {
+			rlRate = parsed
 		}
+	}
 
-		rlBurst := 10
-		if v := os.Getenv("RATE_LIMIT_BURST"); v != "" {
-			if parsed, err := strconv.Atoi(v); err == nil {
-				rlBurst = parsed
-			}
+	rlBurst := 10
+	if v := os.Getenv("RATE_LIMIT_BURST"); v != "" {
+		if parsed, err := strconv.Atoi(v); err == nil {
+			rlBurst = parsed
 		}
-
 	}
 
 	return &config{
-		Port:          port,
-		APIURL:        "https://api.open-meteo.com/v1/forecast",
-		WeatherFields: "temperature_2m,windspeed_10m,relative_humidity_2m,weathercode,is_day",
-		CacheTime:     ttl,
+		RateLimitRate:  rlRate,
+		RateLimitBurst: rlBurst,
+		Port:           port,
+		APIURL:         "https://api.open-meteo.com/v1/forecast",
+		WeatherFields:  "temperature_2m,windspeed_10m,relative_humidity_2m,weathercode,is_day",
+		CacheTime:      ttl,
 	}
 }
