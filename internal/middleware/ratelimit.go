@@ -21,6 +21,7 @@ type RateLimiter struct {
 func NewRateLimiter(r rate.Limit, burst int) *RateLimiter {
 	return &RateLimiter{
 		limiters: make(map[string]*rate.Limiter),
+		lastSeen: make(map[string]time.Time),
 		rate:     r,
 		burst:    burst,
 	}
