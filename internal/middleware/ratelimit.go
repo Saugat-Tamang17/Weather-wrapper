@@ -19,14 +19,30 @@ type RateLimiter struct {
 }
 
 func NewRateLimiter(r rate.Limit, burst int) *RateLimiter {
-	return &RateLimiter{
+	rl := &RateLimiter{
 		limiters: make(map[string]*rate.Limiter),
 		lastSeen: make(map[string]time.Time),
 		rate:     r,
 		burst:    burst,
 	}
+
 	go rl.cleanupLoop()
 	return rl
+}
+
+func (rl *RateLimiter) cleanupLoop() {
+	ticker := time.NewTicker(5 * time.Minute)
+	defer ticker.Stop()
+	for range ticker.C {
+		rl.mu.Lock()
+		for ip, t := range rl.lastSeen {
+			if time.Since(t) > 5*time.Minute {
+				delete(rl.limiters, ip)
+				delete(rl.lastSeen, ip)
+			}
+		}
+		rl.mu.Unlock()
+	}
 }
 
 func (rl *RateLimiter) getLimiter(ip string) *rate.Limiter {
